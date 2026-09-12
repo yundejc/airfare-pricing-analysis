@@ -1,5 +1,5 @@
 # Airfare Pricing and Purchase-Timing Analysis
-
+[![Open In Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/github/yundejc/airfare-pricing-analysis/blob/main/Airfare_Pricing_Analysis.ipynb)
 An end-to-end analytics project examining how booking timing, cabin class, airline, route, and itinerary characteristics are associated with Indian domestic airfare. The project combines exploratory analysis, machine learning, grouped validation, historical policy simulation, and interactive Tableau dashboards.
 
 ## Interactive Dashboards
