@@ -1,109 +1,146 @@
 # Airfare Pricing and Purchase-Timing Analysis
 
-An end-to-end analytics project examining how booking timing, airline, cabin class, route, duration, and number of stops relate to domestic airfare prices in India.
+An end-to-end analytics project examining how booking timing, cabin class, airline, route, and itinerary characteristics are associated with Indian domestic airfare. The project combines exploratory analysis, machine learning, grouped validation, historical policy simulation, and interactive Tableau dashboards.
 
-[View the Interactive Tableau Dashboard](https://public.tableau.com/app/profile/.78083245/viz/AirfarePricingandPurchase-TimingAnalysis/AirfarePricingDashboard?publish=yes)
+## Interactive Dashboards
+
+* [Airfare Pricing Dashboard](https://public.tableau.com/app/profile/.78083245/viz/AirfarePricingandPurchase-TimingAnalysis/AirfarePricingDashboard?publish=yes)
+* [Purchase-Timing Decision Dashboard](https://public.tableau.com/app/profile/.78083245/viz/AirfarePricingandPurchase-TimingAnalysis/PurchaseTimingDecisionDashboard?publish=yes)
 
 ## Business Problem
 
-Travelers often lack clear information about how purchasing decisions and itinerary characteristics affect ticket prices. This project analyzes 300,153 airfare observations to:
+Airfare varies substantially across booking windows, routes, airlines, cabin classes, and itinerary structures. This project addresses three questions:
 
-* Identify major airfare drivers
-* Compare pricing across airlines, routes, and cabin classes
-* Measure the relationship between advance booking and ticket prices
-* Build and validate a machine-learning model for airfare estimation
-* Translate the findings into practical purchase-timing insights
+1. Which factors are most strongly associated with airfare?
+2. Can a machine-learning model generalize to flight numbers not observed during training?
+3. Could a model-guided booking-window strategy outperform random booking timing in a historical simulation?
 
 ## Dataset
 
-The dataset contains 300,153 Indian domestic flight observations across:
+The analysis uses the [Flight Price Prediction dataset by Shubham Bathwal](https://www.kaggle.com/datasets/shubhambathwal/flight-price-prediction).
 
+* 300,153 airfare observations
 * 6 airlines
-* 30 directional routes
 * 1,561 flight numbers
-* Economy and business cabins
-* Booking windows from 1 to 49 days before departure
+* 30 directional routes
+* Economy and business-class fares
+* Booking windows ranging from 1 to 49 days before departure
 
-The data passed quality checks with no missing values, duplicate rows, nonpositive prices, or invalid same-city routes.
+The dataset includes airline, flight number, origin, destination, departure and arrival periods, number of stops, cabin class, duration, days remaining before departure, and fare.
 
-[Dataset on Kaggle](https://www.kaggle.com/datasets/shubhambathwal/flight-price-prediction)
+## Data Preparation
 
-## Key Findings
+The workflow:
+
+* Removed the exported index column
+* Checked missing values and duplicate observations
+* Validated positive fare and duration values
+* Verified that origins and destinations differed
+* Created directional route labels
+* Grouped `days_left` into six booking windows
+* Built preprocessing and modeling steps within a scikit-learn pipeline
+
+## Exploratory Findings
 
 ### Booking Timing
 
-Advance booking is particularly important for economy travelers.
+Economy fares showed substantially greater timing sensitivity than business fares.
 
-* Economy average fare: ₹11,634 at 1–7 days versus ₹4,789 at 41–49 days, representing a 142.9% last-minute premium.
-* Business average fare: ₹56,745 at 1–7 days versus ₹51,559 at 41–49 days, representing a 10.1% premium.
+* Economy: INR 11,634 when booked 1–7 days before departure versus INR 4,789 at 41–49 days
+* Business: INR 56,745 when booked 1–7 days before departure versus INR 51,559 at 41–49 days
+* The observed last-minute premium was 142.9% for economy and 10.1% for business
 
-### Airline Pricing
+### Airline Differences
 
-Airline comparisons were performed separately by cabin class.
+* Economy average fares ranged from INR 4,091 for AirAsia to INR 7,807 for Vistara
+* Business observations were available only for Air India and Vistara
+* Vistara had the higher average business fare
 
-* Business: Vistara averaged ₹55,477, compared with ₹47,131 for Air India.
-* Economy: Vistara averaged ₹7,807, while AirAsia averaged ₹4,091.
-* Only Air India and Vistara offered business-class observations in the dataset.
+### Route Differences
 
-### Routes
+* Economy route averages differed by approximately 38.7%
+* Business route averages differed by approximately 34.2%
+* Route-level comparisons were conducted separately by cabin class to avoid mixing structurally different fare segments
 
-Route-level prices differed substantially within each cabin class.
+### Stops and Duration
 
-* Business: Bangalore → Kolkata was highest at ₹58,855; Mumbai → Delhi was lowest at ₹43,846.
-* Economy: Kolkata → Chennai was highest at ₹8,012; Mumbai → Hyderabad was lowest at ₹5,775.
+Higher-stop itineraries were associated with higher average fares, but they also had substantially longer durations and different route compositions. This relationship is therefore interpreted as an association rather than a causal stop premium.
 
-### Number of Stops
+## Predictive Model
 
-Higher-stop itineraries were associated with higher average fares. However, this pattern should not be interpreted as a causal stop premium because stops are also associated with route and flight duration.
+A Random Forest regression pipeline was trained using:
 
-## Predictive Modeling
+* Airline
+* Origin and destination
+* Departure and arrival periods
+* Number of stops
+* Cabin class
+* Flight duration
+* Days remaining before departure
 
-A Random Forest regression pipeline was developed using:
+Flight number was excluded as a predictor to reduce high-cardinality memorization risk.
 
-* One-hot encoding for categorical variables
-* Direct passthrough for numerical variables
-* Airline, cities, departure and arrival periods, stops, cabin class, duration, and days before departure as predictors
+### Random-Split Performance
 
-Flight number was excluded from the predictors to reduce memorization risk.
+| Model                 |       MAE |      RMSE |     R² |
+| --------------------- | --------: | --------: | -----: |
+| Class-median baseline | INR 4,824 | INR 7,950 | 0.8776 |
+| Random Forest         | INR 1,297 | INR 2,792 | 0.9849 |
 
-### Random-Split Results
+The Random Forest reduced MAE by 73.1% and RMSE by 64.9% relative to the class-median baseline.
 
-| Metric | Random Forest | Class-Median Baseline |
-| ------ | ------------: | --------------------: |
-| MAE    |        ₹1,297 |                ₹4,824 |
-| RMSE   |        ₹2,792 |                ₹7,950 |
-| R²     |        0.9849 |                0.8776 |
+### Grouped Holdout Performance
 
-The Random Forest reduced MAE by 73.1% and RMSE by 64.9% relative to the baseline.
+To evaluate generalization more realistically, flight numbers were separated between training and testing.
 
-### Grouped-Holdout Validation
+* Training set: 245,189 observations and 1,248 flight numbers
+* Test set: 54,964 observations and 313 unseen flight numbers
+* Flight-number overlap: 0
 
-To test generalization more rigorously, observations were split by flight number:
+|       MAE |      RMSE |     R² |
+| --------: | --------: | -----: |
+| INR 2,898 | INR 5,278 | 0.9449 |
 
-* Training flight numbers: 1,248
-* Testing flight numbers: 313
-* Overlapping flight numbers: 0
+The grouped result is used as the primary reported model performance because it measures prediction on flight numbers not observed during training.
 
-| Metric | Grouped Holdout |
-| ------ | --------------: |
-| MAE    |          ₹2,898 |
-| RMSE   |          ₹5,278 |
-| R²     |          0.9449 |
+## Historical Booking-Window Simulation
 
-The lower grouped-holdout performance indicates that the random split was optimistic, but the model retained strong predictive performance on unseen flight numbers.
+A historical policy simulation compared two strategies:
+
+* **Model-guided policy:** Select the booking window with the lowest predicted average fare
+* **Random-timing policy:** Select one of the six booking windows with equal probability
+
+The strict evaluation retained 603 decision units with observations in all six booking windows. Random booking timing was simulated 5,000 times.
+
+| Segment  | Random-Timing Fare | Model-Guided Fare | Average Savings | Savings Rate | 95% Simulation Interval |
+| -------- | -----------------: | ----------------: | --------------: | -----------: | ----------------------: |
+| Overall  |         INR 17,042 |        INR 15,301 |       INR 1,740 |       10.21% |            9.14%–11.30% |
+| Business |         INR 46,571 |        INR 45,959 |         INR 612 |        1.31% |             0.67%–2.03% |
+| Economy  |          INR 6,654 |         INR 4,510 |       INR 2,144 |       32.20% |           29.53%–34.77% |
+
+**Business conclusion:** In a historical grouped-holdout simulation, the model-guided booking-window strategy reduced average airfare by 10.21% relative to random booking timing.
+
+## Historical Buy Now / Hold Signal
+
+The Purchase-Timing Decision Dashboard includes a historical signal:
+
+* **Buy Now:** The current predicted fare is within 5% of the lowest predicted fare available in the remaining booking windows
+* **Hold:** A remaining booking window has a predicted fare that is more than 5% lower than the current prediction
+
+Users can explore the signal by cabin class, route, flight number, and current booking window.
 
 ## Feature Importance
 
-Permutation importance identified the leading predictive features as:
+Permutation importance identified the strongest predictive features as:
 
 1. Cabin class
 2. Flight duration
-3. Source city
+3. Origin city
 4. Airline
 5. Destination city
-6. Days before departure
+6. Days remaining before departure
 
-These values represent predictive importance rather than causal effects.
+Feature importance is predictive rather than causal.
 
 ## Tools
 
@@ -113,14 +150,20 @@ These values represent predictive importance rather than causal effects.
 * scikit-learn
 * Matplotlib
 * seaborn
-* Tableau
+* Tableau Public
+* Google Colab
 
-## Project Files
+## Repository Contents
 
-* [`Airfare_Pricing_Analysis.ipynb`](Airfare_Pricing_Analysis.ipynb) — data preparation, exploratory analysis, modeling, validation, and feature importance
-* [Interactive Tableau Dashboard](https://public.tableau.com/app/profile/.78083245/viz/AirfarePricingandPurchase-TimingAnalysis/AirfarePricingDashboard?publish=yes)
+* [`Airfare_Pricing_Analysis.ipynb`](Airfare_Pricing_Analysis.ipynb): Data preparation, exploratory analysis, predictive modeling, grouped validation, policy simulation, and signal generation
+* `README.md`: Project overview and results
+* `LICENSE`: MIT License
 
 ## Limitations
 
-The dataset is cross-sectional and does not contain actual travel dates or repeated historical price observations for the same itinerary. Therefore, the findings describe associations between booking windows and observed fares rather than real-time price movements or causal effects.
+* The dataset is cross-sectional rather than a longitudinal record of the same ticket’s price over time
+* The Buy Now / Hold output is a historical model simulation, not a live purchasing recommendation
+* The policy comparison does not establish a causal effect of following the signal
+* Results may not generalize to other countries, time periods, or airline markets
+* Unobserved factors such as travel date, holidays, demand shocks, and fare restrictions may affect prices
 
