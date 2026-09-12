@@ -6,7 +6,9 @@ An end-to-end analytics project examining how booking timing, cabin class, airli
 
 * [Airfare Pricing Dashboard](https://public.tableau.com/app/profile/.78083245/viz/AirfarePricingandPurchase-TimingAnalysis/AirfarePricingDashboard?publish=yes)
 * [Purchase-Timing Decision Dashboard](https://public.tableau.com/app/profile/.78083245/viz/AirfarePricingandPurchase-TimingAnalysis/PurchaseTimingDecisionDashboard?publish=yes)
+![Purchase-Timing Decision Dashboard](images/purchase_timing_dashboard.png)
 
+*Historical purchase-timing heatmap and model-guided Buy Now / Hold signal.*
 ## Business Problem
 
 Airfare varies substantially across booking windows, routes, airlines, cabin classes, and itinerary structures. This project addresses three questions:
