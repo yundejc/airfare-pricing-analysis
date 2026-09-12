@@ -5,6 +5,9 @@ An end-to-end analytics project examining how booking timing, cabin class, airli
 ## Interactive Dashboards
 
 * [Airfare Pricing Dashboard](https://public.tableau.com/app/profile/.78083245/viz/AirfarePricingandPurchase-TimingAnalysis/AirfarePricingDashboard?publish=yes)
+* ![Airfare Pricing Dashboard](images/airfare_pricing_dashboard.png)
+
+*Exploratory analysis of airfare differences across booking windows, airlines, routes, stops, and cabin classes.*
 * [Purchase-Timing Decision Dashboard](https://public.tableau.com/app/profile/.78083245/viz/AirfarePricingandPurchase-TimingAnalysis/PurchaseTimingDecisionDashboard?publish=yes)
 ![Purchase-Timing Decision Dashboard](images/purchase_timing_dashboard.png)
 
