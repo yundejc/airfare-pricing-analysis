@@ -1,5 +1,5 @@
 # Airfare Pricing and Purchase-Timing Analysis
-[![Open In Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/github/yundejc/airfare-pricing-analysis/blob/main/Airfare_Pricing_Analysis.ipynb)
+[View Notebook on GitHub](https://github.com/yundejc/airfare-pricing-analysis/blob/main/Airfare_Pricing_Analysis.ipynb) | [Open in Google Colab](https://colab.research.google.com/github/yundejc/airfare-pricing-analysis/blob/main/Airfare_Pricing_Analysis.ipynb)
 An end-to-end analytics project examining how booking timing, cabin class, airline, route, and itinerary characteristics are associated with Indian domestic airfare. The project combines exploratory analysis, machine learning, grouped validation, historical policy simulation, and interactive Tableau dashboards.
 
 ## Interactive Dashboards
@@ -29,6 +29,7 @@ The analysis uses the [Flight Price Prediction dataset by Shubham Bathwal](https
 * Booking windows ranging from 1 to 49 days before departure
 
 The dataset includes airline, flight number, origin, destination, departure and arrival periods, number of stops, cabin class, duration, days remaining before departure, and fare.
+Although this project uses Indian domestic airfare data denominated in INR, the analytical framework—including grouped-holdout evaluation, booking-window comparison, and historical policy simulation—can be adapted to other airline markets.
 
 ## Data Preparation
 
